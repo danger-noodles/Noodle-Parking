@@ -4,6 +4,7 @@ from RDW.apiClient import ApiClient
 
 class RdwClient:
     client = ApiClient(RDW_URL, RDW_KEY)
+    data = None
 
     def fetch_by_plate(self, plate) -> dict:
         data = None
@@ -12,15 +13,16 @@ class RdwClient:
         except Exception as err:
             print('API error: ', err)
 
-        return data
+        self.data = data
 
-    def validate_plate(self, carData) -> bool:
-        valid = True
-        date = carData['datumeersteafgiftenederland']
+    def validate_plate(self) -> bool:
+        if not self.data:
+            return False
+
+        date = self.data['datumeersteafgiftenederland']
         year = date.split("-")
-        fuel_type = carData['hoofdbrandstof']
+        fuel_type = self.data['hoofdbrandstof']
 
         if fuel_type.lower() == 'diesel' and int(year[0]) >= int('2001'):
-            valid = False
-
-        return valid
+            return False
+        return True
