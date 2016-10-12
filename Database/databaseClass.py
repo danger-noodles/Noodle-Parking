@@ -7,10 +7,6 @@ connection = pymysql.connect(host=DB_HOST,
                              user=DB_USER,
                              passwd=DB_PASS,
                              db=DB)
-# connection = pymysql.connect(host='vps306311.ovh.net',
-#                      user='nonroot',
-#                      passwd='he6ruBreStegEbrU',
-#                      db='server')
 current = connection.cursor()
 
 class DatabaseClass:
@@ -26,18 +22,37 @@ class DatabaseClass:
 
     def insert(self, query):
         try:
-            current.execute(query)
+            with connection.cursor() as cursor:
+                # Create a new record
+                cursor.execute(query)
+
+            # connection is not autocommit by default. So you must commit to save
+            # your changes.
+            connection.commit()
         finally:
             connection.close()
+
     def update(self, query):
         try:
-            current.execute(query)
+            with connection.cursor() as cursor:
+                # Create a new record
+                cursor.execute(query)
+
+            # connection is not autocommit by default. So you must commit to save
+            # your changes.
+            connection.commit()
         finally:
             connection.close()
 
     def delete(self, query):
         try:
-            current.execute(query)
+            with connection.cursor() as cursor:
+                # Create a new record
+                cursor.execute(query)
+
+            # connection is not autocommit by default. So you must commit to save
+            # your changes.
+            connection.commit()
         finally:
             connection.close()
 
