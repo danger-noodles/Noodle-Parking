@@ -1,6 +1,7 @@
 import tkinter as tk
 import fnmatch
 import os
+from PIL import ImageTk, Image
 
 class Pag(tk.Frame):
     def __init__(self):
@@ -119,22 +120,51 @@ class SQLcheck(Pag):
     def initialize(self):
         global images
         global value
-        global imgVal
+        global value2
+        global curPos
+        value2 = 0
+
+        def callback(curPos):
+            PILimage = Image.open('./kentekens/' + images[curPos]).resize((562, 314), Image.ANTIALIAS)
+            LabImage = ImageTk.PhotoImage(PILimage)
+
+            imgLab.configure(image =LabImage)
+            imgLab.image = LabImage
+
         images = {}
         value = 0
-
-        for image in os.listdir(r'C:\Users\marco\PycharmProjects\untitled\miniproject\gui\kentekens'):
+        for image in os.listdir(r'./kentekens'):
             if fnmatch.fnmatch(image, '*.jpg'):
                 if image in images:
-                    print('error')
+                    continue
                 else:
                     images[value] = image
                 value += 1
                 print(images)
 
-        imageNum = tk.IntVar()
+        PILimage = Image.open('./kentekens/' + images[value2]).resize((562, 314), Image.ANTIALIAS)
+        LabImage = ImageTk.PhotoImage(PILimage)
 
-        tk.Button(self, text='check SQL', command=mainpage.Register).pack(side='top', anchor=tk.N)
+        imgLab = tk.Label(self, image = LabImage)
+        imgLab.image = LabImage
+        imgLab.place(relx = 0.5, rely = 0.3, anchor = tk.CENTER)
+
+        def valueUp():
+            global value2
+            value2 +=1
+            curPos = value2
+            callback(curPos)
+
+        def valueDown():
+            global value2
+            value2 -=1
+            curPos = value2
+            callback(curPos)
+
+        backBut = tk.Button(self, text='Previous image', command = lambda:valueDown()).place(relx = 0.29, rely = 0.55)
+        forBut = tk.Button(self, text ='Next image', command = lambda:valueUp()).place(relx=0.66, rely = 0.55)
+
+        tk.Button(self, text='Selecteer Kenteken', command=mainpage.Register).place(relx = 0.5, rely = 0.7, anchor=tk.CENTER)
 
 class mainpage(tk.Frame):
     def __init__(self):
@@ -190,5 +220,5 @@ if __name__ == "__main__":
     root = tk.Tk()
     main = mainpage()
     main.pack(side='top', fill='both', expand=True)
-    root.geometry('960x1024')
+    root.geometry('2048x680')
     root.mainloop()
