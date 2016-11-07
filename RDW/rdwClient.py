@@ -7,13 +7,19 @@ class RdwClient:
     data = None
 
     def fetch_by_plate(self, plate) -> dict:
-        data = None
         try:
+            # API call to get plate data
             data = self.client.get('/voertuiggegevens/' + plate)
         except Exception as err:
-            print('API error: ', err)
+            print('API error:', err)
+            return False
 
-        self.data = data
+        # Return if necessary data is given
+        if 'datumeersteafgiftenederland' in data or 'hoofdbrandstof' in data:
+            self.data = data
+            return True
+        else:
+            return False
 
     def validate_plate(self) -> bool:
         if not self.data:
@@ -23,6 +29,6 @@ class RdwClient:
         year = date.split("-")
         fuel_type = self.data['hoofdbrandstof']
 
-        if fuel_type.lower() == 'diesel' and int(year[0]) < int('2001'):
+        if fuel_type.lower() == 'diesel' and int(year[0]) >= int('2001'):
             return False
         return True
