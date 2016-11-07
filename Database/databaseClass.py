@@ -68,7 +68,7 @@ class DatabaseClass:
 
     def get_customer_details_by_customer_id(self, customer_id) -> list:
         try:
-            current.execute("SELECT * FROM `parking_customers` WHERE `customer_id` ="+customer_id)
+            current.execute("SELECT * FROM `parking_customers` WHERE `customer_id` =" + customer_id + "")
             select = []
             for data in current:
                 select.append(data)
@@ -86,5 +86,15 @@ class DatabaseClass:
                             " `customer_address`,"
                             " `customer_join_date`,"
                             "VALUES (NULL, '{0}','{1}','{2}','{3}')".format(firstname, lastname, address, customer_join_date))
+        finally:
+            connection.close()
+
+    def select(self, query) -> list:
+        try:
+            current.execute(query)
+            select = []
+            for data in current:
+                select.append(data)
+            return select
         finally:
             connection.close()
