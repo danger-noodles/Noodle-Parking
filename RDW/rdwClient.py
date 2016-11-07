@@ -6,6 +6,9 @@ class RdwClient:
     client = ApiClient(RDW_URL, RDW_KEY)
     data = None
 
+    def get_plate_date(self) -> dict:
+        return self.data
+
     def fetch_by_plate(self, plate) -> dict:
         try:
             # API call to get plate data
