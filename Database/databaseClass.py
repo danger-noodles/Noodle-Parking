@@ -10,6 +10,9 @@ connection = pymysql.connect(host=DB_HOST,
 current = connection.cursor()
 
 class DatabaseClass:
+    def close_connection(self):
+            connection.close()
+
     def select(self, query) -> list:
         try:
             current.execute(query)
@@ -17,8 +20,8 @@ class DatabaseClass:
             for data in current:
                 select.append(data)
             return select
-        finally:
-            connection.close()
+        except:
+            print("Exception")
 
     def insert(self, query):
         try:
@@ -29,8 +32,8 @@ class DatabaseClass:
             # connection is not autocommit by default. So you must commit to save
             # your changes.
             connection.commit()
-        finally:
-            connection.close()
+        except:
+            print("Exception")
 
     def update(self, query):
         try:
@@ -41,8 +44,8 @@ class DatabaseClass:
             # connection is not autocommit by default. So you must commit to save
             # your changes.
             connection.commit()
-        finally:
-            connection.close()
+        except:
+            print("Exception")
 
     def delete(self, query):
         try:
@@ -53,8 +56,8 @@ class DatabaseClass:
             # connection is not autocommit by default. So you must commit to save
             # your changes.
             connection.commit()
-        finally:
-            connection.close()
+        except:
+            print("Exception")
 
     def get_customer_id_by_numberplate(self, numberplate) -> list:
         try:
@@ -63,8 +66,8 @@ class DatabaseClass:
             for data in current:
                 select.append(data)
             return select
-        finally:
-            connection.close()
+        except:
+            print("Exception")
 
     def get_customer_details_by_customer_id(self, customer_id) -> list:
         try:
@@ -73,8 +76,8 @@ class DatabaseClass:
             for data in current:
                 select.append(data)
             return select
-        finally:
-            connection.close()
+        except:
+            print("Exception")
 
 
     def insert_customer(self, firstname, lastname, address, postcode, sex, city, email):
@@ -100,6 +103,5 @@ class DatabaseClass:
             # connection is not autocommit by default. So you must commit to save
             # your changes.
             connection.commit()
-        finally:
-            connection.close()
-
+        except:
+            print("Exception")
