@@ -7,18 +7,20 @@ connection = pymysql.connect(host=DB_HOST,
                              user=DB_USER,
                              passwd=DB_PASS,
                              db=DB)
-current = connection.cursor()
+current = connection.cursor(pymysql.cursors.DictCursor)
 
 class DatabaseClass:
-    def select(self, query) -> list:
+    def close_connection(self):
+            connection.close()
+
+    def select(self, query) -> dict:
         try:
             current.execute(query)
-            select = []
             for data in current:
-                select.append(data)
+                select = data
             return select
-        finally:
-            connection.close()
+        except:
+            print("Exception")
 
     def insert(self, query):
         try:
@@ -29,8 +31,8 @@ class DatabaseClass:
             # connection is not autocommit by default. So you must commit to save
             # your changes.
             connection.commit()
-        finally:
-            connection.close()
+        except:
+            print("Exception")
 
     def update(self, query):
         try:
@@ -41,8 +43,8 @@ class DatabaseClass:
             # connection is not autocommit by default. So you must commit to save
             # your changes.
             connection.commit()
-        finally:
-            connection.close()
+        except:
+            print("Exception")
 
     def delete(self, query):
         try:
@@ -53,28 +55,38 @@ class DatabaseClass:
             # connection is not autocommit by default. So you must commit to save
             # your changes.
             connection.commit()
-        finally:
-            connection.close()
+        except:
+            print("Exception")
 
-    def get_customer_id_by_numberplate(self, numberplate) -> list:
+    def get_customer_id_by_numberplate(self, numberplate) -> dict:
         try:
             current.execute("SELECT `customer_id` FROM `parking_numberplates` WHERE `customer_numberplate` = '"+numberplate+"'")
-            select = []
             for data in current:
-                select.append(data)
+                select = data
             return select
-        finally:
-            connection.close()
+        except:
+            print("Exception")
 
-    def get_customer_details_by_customer_id(self, customer_id) -> list:
+    def get_customer_details_by_customer_id(self, customer_id) -> dict:
         try:
             current.execute("SELECT * FROM `parking_customers` WHERE `customer_id` = "+customer_id)
-            select = []
             for data in current:
-                select.append(data)
+                select = data
             return select
-        finally:
-            connection.close()
+        except:
+            print("Exception")
+
+    def get_customer_exists_by_numberplate(self, numberplate) -> bool:
+        try:
+            current.execute("SELECT COUNT(*) as number FROM `parking_numberplates` WHERE `customer_numberplate` = '"+numberplate+"'")
+            for data in current:
+                print(data)
+                if (data['number'] == 0):
+                    return False
+                else:
+                    return True
+        except:
+            print("Exception")
 
 
     def insert_customer(self, firstname, lastname, address, postcode, sex, city, email):
@@ -100,6 +112,5 @@ class DatabaseClass:
             # connection is not autocommit by default. So you must commit to save
             # your changes.
             connection.commit()
-        finally:
-            connection.close()
-
+        except:
+            print("Exception")

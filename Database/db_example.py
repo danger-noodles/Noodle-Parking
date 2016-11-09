@@ -1,7 +1,7 @@
 from Database.databaseClass import DatabaseClass
 
 database = DatabaseClass()
-### Voorbeeld van een select query
+## Voorbeeld van een select query
 # nbplates = database.select("SELECT customer_numberplate FROM `parking_numberplates`")
 #
 # for plates in nbplates:
@@ -19,10 +19,20 @@ database = DatabaseClass()
 # database.get_user_by_numberplate("4-FTA-23")
 # database.get_customer_details_by_customer_id(1)
 
-#numb = database.get_customer_id_by_numberplate('4-FYA-A')
-#print(numb)
+# numb = database.get_customer_id_by_numberplate('4-FYA-A')
+# print(numb)
 
 # details = database.get_customer_details_by_customer_id('1')
 # print(details)
+# print(details['customer_firstnames'])
 
-database.insert_customer("Noortjuhh", "Poloooo", "Elzenlaan4", "3465TJ", "Man", "Driebruggen", "wouter@highserve.nl")
+# database.insert_customer("Noortjuhh", "Poloooo", "Elzenlaan4", "3465TJ", "Man", "Driebruggen", "wouter@highserve.nl")
+
+boolb = database.get_customer_exists_by_numberplate('4-FYA-A')
+print(boolb)
+
+boola = database.get_customer_exists_by_numberplate('4-FaaYA-A')
+print(boola)
+# print(bool)
+### Closes the database connection
+database.close_connection()
