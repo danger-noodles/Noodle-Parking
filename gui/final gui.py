@@ -1,7 +1,13 @@
+from Database.databaseClass import DatabaseClass
+from Utils.emailSMTP import EmailSmtp
 import tkinter as tk
 import fnmatch
 import os
+import time
 from PIL import ImageTk, Image
+
+database = DatabaseClass()
+email_server = EmailSmtp()
 
 class Pag(tk.Frame):
     def __init__(self):
@@ -39,6 +45,7 @@ class controle(Pag):
         tk.Button(self, text='vergelijk', command=mainpage.verbod).pack(side='top', anchor=tk.N)
 
 class uitcheck(Pag):
+    global datalink
     def __init__(self):
         super().__init__()
         label = tk.Label(self, text='dit is de pagina voor factuurgegevens')
@@ -94,24 +101,72 @@ class uitcheck(Pag):
         tk.Button(self, text='Schrijf in', command=self.printlab).pack(side='top', anchor=tk.N)
 
     def printlab(self):
-        print(voornaam.get())
-        print(achternaam.get())
-        print(geboorteDatum.get())
-        print(adres.get())
-        print(postcode.get())
-        print(woonplaats.get())
-        print(e_mail.get())
+        database.insert_customer(voornaam.get(), achternaam.get(), adres.get(), postcode.get(), var.get(), woonplaats.get(), e_mail.get())
         mainpage.DoneReg()
+
+class betaal(Pag):
+    def __init__(self):
+        super().__init__()
+        tk.Label(self, text = 'selecteer uw betaalmethode:').pack()
+        self.initialize()
+    def initialize(self):
+        global set
+        set = 0
+        contant = tk.Button(self, text = 'contant betalen', command = self.setting).place(rely = 0.1, relx = 0.5, anchor = tk.CENTER)
+        factuur = tk.Button(self, text = 'factuur', command = self.setting2).place(rely=0.15, relx = 0.5, anchor = tk.CENTER)
+
+    def setting(self):
+        global set
+        set = 1
+        mainpage.func()
+
+    def setting2(self):
+        global set
+        set = 2
+        mainpage.func()
 
 class done(Pag):
     def __init__(self):
         super().__init__()
-        label = tk.Label(self, text='Dit is het Einde')
-        label.pack()
         self.initialize()
 
     def initialize(self):
-        pass
+        tk.Label(self, text = 'u heeft contant betaald').place(rely = 0.2, relx = 0.5, anchor = tk.CENTER)
+        tk.Label(self, text = 'U bent klaar, U kunt nu gaan').place(rely = 0.1, relx = 0.5, anchor = tk.CENTER)
+        tk.Button(self, text = 'volgende klant', command = mainpage.start).place(rely = 0.4, relx = 0.5, anchor = tk.CENTER)
+
+class done2(Pag):
+    def __init__(self):
+        super().__init__()
+        self.initialize()
+    def initialize(self):
+        global invoice
+        ServData = {}
+        tk.Label(self, text = 'U krijgt een factuur per e-mail gestuurd').place(rely = 0.2, relx = 0.5, anchor = tk.CENTER)
+        tk.Label(self, text = 'U bent klaar, U kunt nu gaan').place(rely = 0.1, relx = 0.5, anchor = tk.CENTER)
+
+        #kenId = database.get_customer_id_by_numberplate('4-FYA-A')
+        ServData = database.get_customer_details_by_customer_id('31')
+        #print(database.get_customer_details_by_customer_id('1'))
+        email_server.set_subject('Factuur Parkeren')
+        email_server.set_to_address(ServData['customer_email'])
+        print(ServData)
+        invoice = {
+            'id': 1337,
+            'date': time.time(),
+            'due_date': time.time(),
+            'description': 'Parking noodle parkeer garage',
+            'price': time.time() * 0.6,
+            'client': {
+            'address': 'Sesam straat 3',
+            'country': 'Nederland',
+            'city': 'Uitweg',
+            'name': 'Harry baksel',
+            'zip-code': '1337 LD'
+            }
+        }
+        email_server.send_invoice_mail(invoice)
+        tk.Button(self, text = 'volgende klant', command = mainpage.start).place(rely = 0.4, relx = 0.5, anchor = tk.CENTER)
 
 class SQLcheck(Pag):
     def __init__(self):
@@ -140,7 +195,7 @@ class SQLcheck(Pag):
                 else:
                     images[value] = image
                 value += 1
-                print(images)
+                #print(images)
 
         PILimage = Image.open('./kentekens/' + images[value2]).resize((562, 314), Image.ANTIALIAS)
         LabImage = ImageTk.PhotoImage(PILimage)
@@ -170,17 +225,20 @@ class mainpage(tk.Frame):
     def __init__(self):
         super().__init__()
         self.initialize()
-
     def initialize(self):
         global p1
         global p2
         global p3
         global p4
+        global p5
+        global p6
 
         p1=controle()
         p2=uitcheck()
         p3=done()
         p4=SQLcheck()
+        p5=betaal()
+        p6=done2()
 
         self.buttonframe = tk.Frame(self)
         self.container = tk.Frame(self)
@@ -191,19 +249,25 @@ class mainpage(tk.Frame):
         p2.place(in_=self.container, x=0, y=0, relwidth=1, relheight=1)
         p3.place(in_=self.container, x=0, y=0, relwidth=1, relheight=1)
         p4.place(in_=self.container, x=0, y=0, relwidth=1, relheight=1)
+        p5.place(in_=self.container, x=0, y=0, relwidth=1, relheight=1)
+        p6.place(in_=self.container, x=0, y=0, relwidth=1, relheight=1)
 
         b1 = tk.Button(self.buttonframe, text="Controle", command=p1.lift)
         b2 = tk.Button(self.buttonframe, text="Uitchecken", command=p2.lift)
         b3 = tk.Button(self.buttonframe, text="SQL", command=p4.lift)
+        b4 = tk.Button(self.buttonframe, text="betaal methode", command=p5.lift)
+        b5 = tk.Button(self.buttonframe, text = 'done factuur', command = p6.lift)
 
-        b1.pack(side="right")
-        b2.pack(side="right")
-        b3.pack(side="right")
+        #b1.pack(side="right")
+        #b2.pack(side="right")
+        #b3.pack(side="right")
+        #b4.pack(side="right")
+        #b5.pack(side="right")
 
-        p1.show()
+        p4.show()
 
     def verbod():
-        if brandstof.get() == 1 and int(afgifte.get()) <= 2001:
+        if brandstof.get() == 1 and int(afgifte.get()) <= 2000:
             tk.Label(text='Wouter komt je stompen').pack()
             print('verbod')
         else:
@@ -211,10 +275,24 @@ class mainpage(tk.Frame):
             p4.lift()
 
     def DoneReg():
-        p3.lift()
+        p6.lift()
 
     def Register():
-        p2.lift()
+        CusEx = database.get_customer_exists_by_numberplate('4-FYA-A')
+        if CusEx == True:
+            p5.lift()
+        else:
+            p2.lift()
+
+    def start():
+        p4.lift()
+
+    def func():
+        if set == 1:
+            p3.lift()
+        if set == 2:
+            p6.lift()
+
 
 if __name__ == "__main__":
     root = tk.Tk()
