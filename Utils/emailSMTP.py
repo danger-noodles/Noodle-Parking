@@ -38,7 +38,7 @@ class EmailSmtp:
             Factuur voor:<br />
             ''' + invoice_data['client']['name'] + '''<br />
             ''' + invoice_data['client']['address'] + '''<br />
-            ''' + invoice_data['client']['country'] + ''',''' + invoice_data['client']['city'] + ''',''' + invoice_data['client']['zip-code'] + '''<br /><br />
+            ''' + invoice_data['client']['city'] + ''',''' + invoice_data['client']['zip-code'] + ''',''' + invoice_data['client']['country'] + '''<br /><br />
             <h1>FACTUUR</h1>
             <hr>
             <table>
