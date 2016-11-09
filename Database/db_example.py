@@ -19,20 +19,28 @@ database = DatabaseClass()
 # database.get_user_by_numberplate("4-FTA-23")
 # database.get_customer_details_by_customer_id(1)
 
-# numb = database.get_customer_id_by_numberplate('4-FYA-A')
+# numb = database.get_customer_id_by_numberplate('4-FYA-AA')
 # print(numb)
+#
+# numb = database.get_customer_details_by_numberplate('4-FYA-AA')
+# print(numb)
+
+numb = database.get_customer_history_by_numberplate('4-FYA-AA', 1)
+print(numb)
 
 # details = database.get_customer_details_by_customer_id('1')
 # print(details)
-# print(details['customer_firstnames'])
+# print(details['customer_firstname'])
 
 # database.insert_customer("Noortjuhh", "Poloooo", "Elzenlaan4", "3465TJ", "Man", "Driebruggen", "wouter@highserve.nl")
 
-boolb = database.get_customer_exists_by_numberplate('4-FYA-A')
-print(boolb)
+# boolb = database.get_customer_exists_by_numberplate('4-FYA-A')
 
-boola = database.get_customer_exists_by_numberplate('4-FaaYA-A')
-print(boola)
+
+#
+# var2 = database.get_customer_details_by_customer_id('1')
+# print(var2)
+
 # print(bool)
 ### Closes the database connection
 database.close_connection()
