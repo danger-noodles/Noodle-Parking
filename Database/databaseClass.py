@@ -7,7 +7,7 @@ connection = pymysql.connect(host=DB_HOST,
                              user=DB_USER,
                              passwd=DB_PASS,
                              db=DB)
-current = connection.cursor()
+current = connection.cursor(pymysql.cursors.DictCursor)
 
 class DatabaseClass:
     def close_connection(self):
@@ -16,9 +16,8 @@ class DatabaseClass:
     def select(self, query) -> list:
         try:
             current.execute(query)
-            select = []
             for data in current:
-                select.append(data)
+                select = data
             return select
         except:
             print("Exception")
@@ -62,9 +61,8 @@ class DatabaseClass:
     def get_customer_id_by_numberplate(self, numberplate) -> list:
         try:
             current.execute("SELECT `customer_id` FROM `parking_numberplates` WHERE `customer_numberplate` = '"+numberplate+"'")
-            select = []
             for data in current:
-                select.append(data)
+                select = data
             return select
         except:
             print("Exception")
@@ -72,9 +70,8 @@ class DatabaseClass:
     def get_customer_details_by_customer_id(self, customer_id) -> list:
         try:
             current.execute("SELECT * FROM `parking_customers` WHERE `customer_id` = "+customer_id)
-            select = []
             for data in current:
-                select.append(data)
+                select = data
             return select
         except:
             print("Exception")
