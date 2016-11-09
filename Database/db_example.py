@@ -25,8 +25,17 @@ database = DatabaseClass()
 # numb = database.get_customer_details_by_numberplate('4-FYA-AA')
 # print(numb)
 
-numb = database.get_customer_history_by_numberplate('4-FYA-AA', 1)
-print(numb)
+# numb = database.get_customer_history_by_numberplate('4-FYA-AA', 1)
+# print(numb)
+#
+#
+# asdf = database.get_customer_details_by_numberplate('4-FYA-AA')
+# print(asdf)
+
+# dddd = database.checkout(1)
+# print(dddd)
+
+# database.checkin('')
 
 # details = database.get_customer_details_by_customer_id('1')
 # print(details)

@@ -58,16 +58,6 @@ class DatabaseClass:
         except Exception as error:
             print("Exception:", error)
 
-    def get_customer_id_by_numberplate(self, numberplate) -> dict:
-        try:
-            current.execute("SELECT `id` FROM `parking_numberplate` WHERE `numberplate` = '"+numberplate+"'")
-            for data in current:
-
-                select = data
-            return select
-        except Exception as error:
-            print("Exception:", error)
-
     def get_customer_details_by_numberplate(self, numberplate) -> dict:
         try:
             current.execute("SELECT pc.* FROM "
@@ -97,17 +87,6 @@ class DatabaseClass:
         except Exception as error:
             print("Exception:", error)
 
-    def get_customer_exists_by_numberplate(self, numberplate) -> bool:
-        try:
-            current.execute("SELECT COUNT(*) as number FROM `parking_numberplates` WHERE `customer_numberplate` = '"+numberplate+"'")
-            for data in current:
-                if (data['number'] == 0):
-                    return False
-                else:
-                    return True
-        except Exception as error:
-            print("Exception:", error)
-
     def insert_customer(self, firstname, lastname, address, postcode, sex, city, email):
         try:
             with connection.cursor() as cursor:
@@ -127,6 +106,58 @@ class DatabaseClass:
                             .format(firstname, lastname, address, customer_join_date, postcode, sex, city, email))
 
                 cursor.execute(query)
+
+            # connection is not autocommit by default. So you must commit to save
+            # your changes.
+            connection.commit()
+        except Exception as error:
+            print("Exception:", error)
+
+
+    def checkin(self, parking_numberplate, parking_car_fuel, parking_car_releasedate, parking_car_name, parking_car_type, parking_car_body,parking_car_cylinder_capacity):
+        try:
+            with connection.cursor() as cursor:
+                # Create a new record
+                parking_start = int(time.time())
+
+                query = ("INSERT INTO `parking_numberplate`(`id`, `numberplate`) VALUES (NULL, '"+parking_numberplate+"')")
+                cursor.execute(query)
+
+                parking_numberplate_id = connection.insert_id()
+
+                query = ("INSERT INTO `parking_history`"
+                         "(`parking_id`,"
+                         " `parking_numberplate_id`,"
+                         " `parking_start`,"
+                         " `parking_stop`,"
+                         " `parking_car_fuel`,"
+                         " `parking_car_releasedate`,"
+                         " `parking_car_name`,"
+                         " `parking_car_type`,"
+                         " `parking_car_body`,"
+                         " `parking_car_cylinder_capacity`) "
+                         "VALUES (NULL,'{0}','{1}','{2}','{3}','{4}','{5}','{6}')".format(parking_numberplate_id,
+                                                                                             parking_start,
+                                                                                             parking_car_fuel,
+                                                                                             parking_car_releasedate,
+                                                                                             parking_car_name,
+                                                                                             parking_car_type,
+                                                                                             parking_car_body,
+                                                                                             parking_car_cylinder_capacity))
+                cursor.execute(query)
+
+            # connection is not autocommit by default. So you must commit to save
+            # your changes.
+            connection.commit()
+        except Exception as error:
+            print("Exception:", error)
+
+    def checkout(self, parking_numberplate_id):
+        try:
+            with connection.cursor() as cursor:
+                parking_stop = int(time.time())
+                # Create a new record
+                cursor.execute("UPDATE `parking_history` SET `parking_stop`= "+str(parking_stop)+" WHERE `parking_numberplate_id` = "+str(parking_numberplate_id)+" ORDER BY parking_id DESC LIMIT 1")
 
             # connection is not autocommit by default. So you must commit to save
             # your changes.
