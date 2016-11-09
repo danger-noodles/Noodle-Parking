@@ -76,11 +76,20 @@ class DatabaseClass:
         except:
             print("Exception")
 
+    def get_customer_history_by_customer_id(self, customer_id) -> dict:
+        try:
+            current.execute("SELECT * FROM `parking_history` WHERE `parking_customer_id` = "+customer_id)
+            history = []
+            for data in current:
+                history.append(data)
+            return history
+        except:
+            print("Exception")
+
     def get_customer_exists_by_numberplate(self, numberplate) -> bool:
         try:
             current.execute("SELECT COUNT(*) as number FROM `parking_numberplates` WHERE `customer_numberplate` = '"+numberplate+"'")
             for data in current:
-                print(data)
                 if (data['number'] == 0):
                     return False
                 else:
