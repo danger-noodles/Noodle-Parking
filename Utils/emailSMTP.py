@@ -1,4 +1,5 @@
 from smtplib import SMTP
+from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
@@ -31,6 +32,62 @@ class EmailSmtp:
 
     def set_subject(self, subject):
         self.subject = subject
+
+    def send_invoice_mail(self, invoice_data):
+        self.set_content('''
+            Factuur voor:<br />
+            ''' + invoice_data['client']['name'] + '''<br />
+            ''' + invoice_data['client']['address'] + '''<br />
+            ''' + invoice_data['client']['country'] + ''',''' + invoice_data['client']['city'] + ''',''' + invoice_data['client']['zip-code'] + '''<br /><br />
+            <h1>FACTUUR</h1>
+            <hr>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Factuur Nr:</td>
+                        <td>''' + str(invoice_data['id']) + '''<td>
+                    </tr>
+                    <tr>
+                        <td>Date:</td>
+                        <td>''' + datetime.fromtimestamp(invoice_data['date']).strftime('%Y-%m-%d') + '''<td>
+                    </tr>
+                    <tr>
+                        <td>Date:</td>
+                        <td>''' + datetime.fromtimestamp(invoice_data['due_date']).strftime('%Y-%m-%d') + '''<td>
+                    </tr>
+                    <tr>
+                        <td>DESCRIPTION</td>
+                        <td>''' + invoice_data['description'] + '''<td>
+                    </tr>
+                    <tr>
+                        <td>PRICE<td>
+                        <td>''' + str(invoice_data['price']) + '''<td>
+                    </tr>
+                </tbody>
+            </table>
+            <br />
+            <b>Payment terms:</b> Payment within ''' + str((datetime.fromtimestamp(invoice_data['due_date']) - datetime.fromtimestamp(invoice_data['date'])).days) + ''' days<br />
+            <b>Payment details:</b><br />
+            Money transfer to the account below:<br />
+            <br />
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Bank:</td>
+                        <td>ING bank</td>
+                    </tr>
+                    <tr>
+                        <td>IBAN:</td>
+                        <td>NL99 ING 1337 1414 69</td>
+                    </tr>
+                    <tr>
+                        <td>Payment Reference:</td>
+                        <td>''' + str(invoice_data['id']) + '''</td>
+                    </tr>
+                </tbody>
+            </table>
+        ''')
+        self.send_mail()
 
     def send_stomp_mail(self):
         self.set_content('''
