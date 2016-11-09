@@ -146,11 +146,11 @@ class done2(Pag):
         tk.Label(self, text = 'U bent klaar, U kunt nu gaan').place(rely = 0.1, relx = 0.5, anchor = tk.CENTER)
 
         #kenId = database.get_customer_id_by_numberplate('4-FYA-A')
-        ServData = database.get_customer_details_by_customer_id('31')
+        ServData = database.get_customer_details_by_numberplate('4-FYA-AA')
         #print(database.get_customer_details_by_customer_id('1'))
         email_server.set_subject('Factuur Parkeren')
         email_server.set_to_address(ServData['customer_email'])
-        print(ServData)
+        #print(ServData)
         invoice = {
             'id': 1337,
             'date': time.time(),
@@ -158,14 +158,14 @@ class done2(Pag):
             'description': 'Parking noodle parkeer garage',
             'price': time.time() * 0.6,
             'client': {
-            'address': 'Sesam straat 3',
-            'country': 'Nederland',
-            'city': 'Uitweg',
-            'name': 'Harry baksel',
-            'zip-code': '1337 LD'
-            }
+                'name': ServData['customer_firstname'] + ' ' + ServData['customer_lastname'],
+                'address': ServData['customer_address'],
+                'city': ServData['customer_city'],
+                'zip-code': ServData['customer_postcode'],
+                'country': 'Nederland'
+                }
         }
-        email_server.send_invoice_mail(invoice)
+        #email_server.send_invoice_mail(invoice)
         tk.Button(self, text = 'volgende klant', command = mainpage.start).place(rely = 0.4, relx = 0.5, anchor = tk.CENTER)
 
 class SQLcheck(Pag):
@@ -278,12 +278,13 @@ class mainpage(tk.Frame):
         p6.lift()
 
     def Register():
-        CusEx = database.get_customer_exists_by_numberplate('4-FYA-A')
-        if CusEx == True:
-            p5.lift()
-        else:
+        CusEx = database.get_customer_history_by_numberplate('4-FYA-AA', 1)
+        print(CusEx)
+        CusEx2 = CusEx[0]
+        if CusEx2['parking_id'] == 0:
             p2.lift()
-
+        else:
+            p6.lift()
     def start():
         p4.lift()
 
