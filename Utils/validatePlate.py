@@ -6,6 +6,6 @@ def validate_plate(data) -> bool:
     year = date.split("-")
     fuel_type = data['hoofdbrandstof']
 
-    if fuel_type.lower() == 'diesel' and int(year[0]) >= int('2001'):
+    if fuel_type.lower() == 'diesel' and int(year[0]) < int('2001'):
         return False
     return True
