@@ -13,7 +13,7 @@ class DatabaseClass:
     def close_connection(self):
             connection.close()
 
-    def select(self, query) -> list:
+    def select(self, query) -> dict:
         try:
             current.execute(query)
             for data in current:
@@ -58,7 +58,7 @@ class DatabaseClass:
         except:
             print("Exception")
 
-    def get_customer_id_by_numberplate(self, numberplate) -> list:
+    def get_customer_id_by_numberplate(self, numberplate) -> dict:
         try:
             current.execute("SELECT `customer_id` FROM `parking_numberplates` WHERE `customer_numberplate` = '"+numberplate+"'")
             for data in current:
@@ -67,12 +67,24 @@ class DatabaseClass:
         except:
             print("Exception")
 
-    def get_customer_details_by_customer_id(self, customer_id) -> list:
+    def get_customer_details_by_customer_id(self, customer_id) -> dict:
         try:
             current.execute("SELECT * FROM `parking_customers` WHERE `customer_id` = "+customer_id)
             for data in current:
                 select = data
             return select
+        except:
+            print("Exception")
+
+    def get_customer_exists_by_numberplate(self, numberplate) -> bool:
+        try:
+            current.execute("SELECT COUNT(*) as number FROM `parking_numberplates` WHERE `customer_numberplate` = '"+numberplate+"'")
+            for data in current:
+                print(data)
+                if (data['number'] == 0):
+                    return False
+                else:
+                    return True
         except:
             print("Exception")
 
