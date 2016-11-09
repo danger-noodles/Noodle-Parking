@@ -1,6 +1,7 @@
 from smtplib import SMTP
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
 from Utils.config import EMAIL_HOSTNAME, EMAIL_FROM_ADDRESS, EMAIL_POST, EMAIL_ACCOUNT, EMAIL_PASSWORD
 
 
@@ -31,6 +32,16 @@ class EmailSmtp:
     def set_subject(self, subject):
         self.subject = subject
 
+    def send_stomp_mail(self):
+        self.set_content('''
+            Geachte heer dijkstra,
+
+
+            Iemand heeft zojuist geprobeerd in te checken met een diesel auto waarvan de laatste aangifte van voor 2001 is.
+            Wij hopen dat u zo spoedig mogelijk actie onderneemt.
+        '''.replace('\n', '<br />'))
+        self.send_mail()
+
     def send_mail(self):
         # Error exceptions
         if not self.content:
@@ -45,21 +56,35 @@ class EmailSmtp:
         if not self.subject:
             raise ValueError('No subject set')
 
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = self.subject
-        msg['From'] = self.from_address
-        msg['To'] = self.to_address
+        msg_root = MIMEMultipart('related')
+        msg_root['Subject'] = self.subject
+        msg_root['From'] = self.from_address
+        msg_root['To'] = self.to_address
+        msg_root.preamble = 'This is a multi-part message in MIME format.'
 
-        html = '''
-        <html>
-            <head></head>
-            <body>
-                ''' + self.content + '''
-            </body>
-        </html>
-        '''
+        msg_alternative = MIMEMultipart('alternative')
+        msg_root.attach(msg_alternative)
 
-        msg.attach(MIMEText(html, 'html'))
+        html = self.content + '''
+            Met Vriendelijke Groet,
 
-        self.server.sendmail(self.from_address, self.to_address, msg.as_string())
+
+            Danger Noodles
+            <img src="cid:snek.jpg" alt="Snek logo.jpg" />
+        '''.replace('\n', '<br />')
+
+        msg_alternative.attach(MIMEText(html, 'html'))
+
+        # image
+        fp = open('../Utils/snek.jpg', 'rb')
+        msg_image = MIMEImage(fp.read())
+        fp.close()
+        # Define the image's ID as referenced above
+        msg_image.add_header('Content-ID', '<snek.jpg>')
+        msg_root.attach(msg_image)
+
+        self.server.sendmail(self.from_address, self.to_address, msg_root.as_string())
+        # print(msg.as_string())
+
+    def quit(self):
         self.server.quit()
