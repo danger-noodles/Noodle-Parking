@@ -1,6 +1,7 @@
-from Utils.config import RDW_STOMP_EMAIL
 from RDW.rdwClient import RdwClient
+from Utils.config import RDW_STOMP_EMAIL
 from Utils.emailSMTP import EmailSmtp
+from Utils.validatePlate import validate_plate
 
 client = RdwClient()
 email_server = EmailSmtp()
@@ -9,7 +10,7 @@ email_server = EmailSmtp()
 # fetch the data
 # if client.fetch_by_plate('4-TFL-24'):
 if client.fetch_by_plate('94-NDL-5'):
-    if client.validate_plate():
+    if validate_plate(client.get_plate_data()):
         # TODO: Connect this with Wouter's database
         print('Valid car')
     else:
