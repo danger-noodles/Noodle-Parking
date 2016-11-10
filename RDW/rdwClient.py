@@ -19,6 +19,13 @@ class RdwClient:
 
         # Return if necessary data is given
         if 'datumeersteafgiftenederland' in data or 'hoofdbrandstof' in data:
+            # Rename keys to match the database
+            data['parking_car_type'] = data.pop('voertuigsoort')
+            data['parking_car_body'] = data.pop('inrichting')
+            data['parking_car_fuel'] = data.pop('merk')
+            data['parking_car_fuel'] = data.pop('hoofdbrandstof')
+            data['parking_car_cylinder_capacity'] = data.pop('cilinderinhoud')
+            data['parking_car_releasedate'] = data.pop('datumeersteafgiftenederland')
             self.data = data
             return True
         else:
