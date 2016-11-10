@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-
+# import van modules die we gebruiken
 from Database.database import DatabaseClass
 from Utils.emailSMTP import EmailSmtp
 import tkinter as tk
@@ -11,23 +11,30 @@ from PIL import ImageTk, Image
 from OpenALPR.reader import *
 from RDW.rdwClient import RdwClient
 
-
+#classes van modules in variabelen zetten om makkelijk aan te roepen
 db = DatabaseClass()
 email_server = EmailSmtp()
 rdw = RdwClient()
 
+#basic class that frame classes import
 class Pag(tk.Frame):
+    #functie om te initialiseren
     def __init__(self):
         tk.Frame.__init__(self)
+    # functie om de frame te laten showen
     def show(self):
         self.lift()
 
+#Frame class to put in window container
 class controle(Pag):
+    #frame initialization
     def __init__(self):
         super().__init__()
         label = tk.Label(self, text='dit is de controle pagina')
         label.pack(side='bottom')
         self.initialize()
+
+    #function that initializes the widgets
     def initialize(self):
         global info
         global var
@@ -67,6 +74,7 @@ class controle(Pag):
 
         tk.Button(self, text='volgende', command=mainpage.Register).pack()
 
+    #function that updates the images and widgets
     def callback(self, e):
         # Creates a Tkinter compatible image
         raw = Image.open('./Images/' + var.get()).resize((562, 314), Image.ANTIALIAS)
@@ -106,6 +114,7 @@ class controle(Pag):
 
         return(text)
 
+    #function that creates the right textbox text
     def right(self, info):
         global data
         if len(info) == 0:
@@ -146,20 +155,28 @@ class controle(Pag):
 
         return(text)
 
+    #function that checks what fuel the car uses and wich year the car is from.
+    #if certain conditions are met, then the car is not allowed.
     def validate_plate(self, fuel_type, year) -> bool:
         if fuel_type.lower() == 'diesel' and int(year[0]) < 2001:
             return(False)
         else:
             return(True)
 
+#Frame class to put in window container
 class uitcheck(Pag):
+
+    #global to use in the rest of the code
     global datalink
+
+    #frame initialization
     def __init__(self):
         super().__init__()
         label = tk.Label(self, text='dit is de pagina voor factuurgegevens')
         label.pack(side='bottom')
         self.initialize()
 
+    #function that initializes the widgets
     def initialize(self):
         global var3
         global voornaam
@@ -208,45 +225,59 @@ class uitcheck(Pag):
 
         tk.Button(self, text='Schrijf in', command=self.printlab).pack(side='top', anchor=tk.N)
 
+    #function that enters information into the sql database
     def printlab(self):
         db.insert_customer(voornaam.get(), achternaam.get(), adres.get(), postcode.get(), var3.get(), woonplaats.get(), e_mail.get())
         mainpage.DoneReg()
 
+#Frame class to put in window container
 class betaal(Pag):
+    #frame initialization
     def __init__(self):
         super().__init__()
         tk.Label(self, text = 'selecteer uw betaalmethode:').pack()
         self.initialize()
+
+    #function that initializes the widgets
     def initialize(self):
         global set
         set = 0
         contant = tk.Button(self, text = 'contant betalen', command = self.setting).place(rely = 0.1, relx = 0.5, anchor = tk.CENTER)
         factuur = tk.Button(self, text = 'factuur', command = self.setting2).place(rely=0.15, relx = 0.5, anchor = tk.CENTER)
 
+    #Function that sets a flag to define wich frame to switch to
     def setting(self):
         global set
         set = 1
         mainpage.func()
 
+    #Function that sets a flag to define wich frame to switch to
     def setting2(self):
         global set
         set = 2
         mainpage.func()
 
+#Frame class to put in window container
 class done(Pag):
+    #frame initialization
     def __init__(self):
         super().__init__()
         self.initialize()
 
+    #function that initializes the widgets
     def initialize(self):
         tk.Label(self, text = 'u heeft contant betaald').place(rely = 0.2, relx = 0.5, anchor = tk.CENTER)
         tk.Label(self, text = 'U bent klaar, U kunt nu gaan').place(rely = 0.1, relx = 0.5, anchor = tk.CENTER)
         tk.Button(self, text = 'volgende klant', command = mainpage.start).place(rely = 0.4, relx = 0.5, anchor = tk.CENTER)
 
+#Frame class to put in window container
 class done2(Pag):
+    #frame initialization
     def __init__(self):
         super().__init__()
         self.initialize()
+
+    #function that initializes the widgets
     def initialize(self):
         global invoice
         ServData = {}
@@ -279,51 +310,50 @@ class done2(Pag):
            pass
         tk.Button(self, text = 'volgende klant', command = mainpage.start).place(rely = 0.4, relx = 0.5, anchor = tk.CENTER)
 
+#window to create a framecontainer + a way to switch frames
 class mainpage(tk.Frame):
+    #frame initialization
     def __init__(self):
         super().__init__()
         self.initialize()
+
+    #function that initializes the widgets
     def initialize(self):
+
+        #globals to use in other functions
         global p1
         global p2
         global p3
         global p5
         global p6
 
+        #variables get assigned here
         p1=controle()
         p2=uitcheck()
         p3=done()
         p5=betaal()
         p6=done2()
 
+        #creation of container and buttonframe
         self.buttonframe = tk.Frame(self)
         self.container = tk.Frame(self)
         self.buttonframe.pack(side="top", fill="x", expand=False)
         self.container.pack(side="top", fill="both", expand=True)
 
+        #assignement where frames have to go
         p1.place(in_=self.container, x=0, y=0, relwidth=1, relheight=1)
         p2.place(in_=self.container, x=0, y=0, relwidth=1, relheight=1)
         p3.place(in_=self.container, x=0, y=0, relwidth=1, relheight=1)
         p5.place(in_=self.container, x=0, y=0, relwidth=1, relheight=1)
         p6.place(in_=self.container, x=0, y=0, relwidth=1, relheight=1)
 
-        b1 = tk.Button(self.buttonframe, text="Controle", command=p1.lift)
-        b2 = tk.Button(self.buttonframe, text="Uitchecken", command=p2.lift)
-        b4 = tk.Button(self.buttonframe, text="betaal methode", command=p5.lift)
-        b5 = tk.Button(self.buttonframe, text = 'done factuur', command = p6.lift)
-
-        #b1.pack(side="right")
-        #b2.pack(side="right")
-        #b3.pack(side="right")
-        #b4.pack(side="right")
-        #b5.pack(side="right")
-
         p1.show()
 
-
+    #function to switch frame
     def DoneReg():
         p6.lift()
 
+    #function to switch frame, based on a statement
     def Register():
         if controle.validate_plate(data['parking_car_release_date'], data['parking_car_fuel']):
             CusEx = db.get_customer_history_by_numberplate(info[0]['plate'], 1)
@@ -337,16 +367,18 @@ class mainpage(tk.Frame):
             tk.Label(controle, text='Wouter komt stompen').pack()
             email_server.send_stomp_mail()
 
+    #function to switch frame
     def start():
         p1.lift()
 
+    #function to switch frame, based on a statement
     def func():
         if set == 1:
             p3.lift()
         if set == 2:
             p6.lift()
 
-
+#mainloop to render window
 if __name__ == "__main__":
     root = tk.Tk()
     main = mainpage()
