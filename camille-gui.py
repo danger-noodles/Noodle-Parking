@@ -2,7 +2,7 @@
 
 ## IMPORTS
 
-# Installed modules
+# System modules
 from PIL import ImageTk, Image
 import fnmatch
 import os
@@ -19,7 +19,7 @@ from RDW.rdwClient import *
 
 # Function that updates the image and textboxes, gets called by window.bind
 def callback(e) -> None:
-    # Creates a Tkinter compatible image
+    # Create a Tkinter compatible image
     raw = Image.open('./Images/' + var.get()).resize((562, 314), Image.ANTIALIAS)
     img = ImageTk.PhotoImage(raw)
 
@@ -27,19 +27,20 @@ def callback(e) -> None:
     imgwidget.configure(image=img)
     imgwidget.image = img
 
-    # Get plate info
-    info = image_to_list('./Images/' + var.get())
+    # Get license plate info from OpenALPR
+    plate_info = image_to_list('./Images/' + var.get())
 
-    # Place OpenALPR info in left textbox
+    # Place OpenALPR info in the left textbox
     leftwidget.insert(0.0, "\n ---------------------------\n\n\n")
-    leftwidget.insert(0.0, left(info))
+    leftwidget.insert(0.0, left_text(plate_info))
 
     # Place some more info in the right textbox
+    # This is mainly info gathered from the rdw or db
     rightwidget.delete(0.0, tk.END)
-    rightwidget.insert(0.0, right(info))
+    rightwidget.insert(0.0, right_text(plate_info))
 
 # Function thats creates the left textbox text
-def left(info) -> str:
+def left_text(info) -> str:
     if len(info) == 0:
         return(' No license plate detected!\n\n')
 
@@ -57,8 +58,9 @@ def left(info) -> str:
 
     return(text)
 
-# Function thats creates the right textbox text, also sends some info to the db possibly
-def right(info) -> str:
+# Function thats creates the right textbox text
+# Also sends some info to the db possibly
+def right_text(info) -> str:
     if len(info) == 0:
         return('\n\n    [×] ?\n')
 
@@ -66,10 +68,12 @@ def right(info) -> str:
     try:
         used = 'db'
         data = db.get_customer_history_by_numberplate(info[0]['plate'], 1)[0]
+    # If the license plate is not found in the db, try using the rdw
     except IndexError:
         used = 'rdw'
         rdw.fetch_by_plate(info[0]['plate'])
         data = rdw.get_plate_data()
+        # Don't gather data if nothing could be found in either the db or rdw
         if data == None:
             used = 'none'
 
@@ -88,12 +92,12 @@ def right(info) -> str:
         text += '\n    * Brandstof type: ' + data['parking_car_fuel']
         text += '\n    * Cilinder inhoud: ' + str(data['parking_car_cylinder_capacity'])
         text += '\n    * Datum afgifte: ' + str.split(data['parking_car_releasedate'], '-')[0]
+    else:
+        text = '\n\n   [×] ' + info[0]['plate']
 
-    # Place data in db
+    # Place data in db if rdw was used to gather data
     if used == 'rdw':
         db.checkin(info[0]['plate'], data['parking_car_fuel'], str.split(data['parking_car_releasedate'], '-')[0], data['parking_car_name'], data['parking_car_type'], data['parking_car_body'], str(data['parking_car_cylinder_capacity']))
-    elif used == 'none':
-        text = '\n\n   [×] ' + info[0]['plate']
 
     return(text)
 
@@ -116,8 +120,10 @@ window.wm_title('Noodle Parking')
 
 # Add images to dropdown
 images = []
+# TODO: Is the `r` needed here?
 for img in os.listdir(r'./Images'):
     images.append(img)
+images.sort()
 images = tuple(images)
 
 # Create images dropdown
@@ -126,7 +132,7 @@ var.set(images[0])
 drop = tk.OptionMenu(window, var, *images, command = callback)
 drop.place(x=10, y=10)
 
-# Creates a Tkinter compatible image
+# Create a Tkinter compatible image
 raw = Image.open('./Images/' + var.get()).resize((562, 314), Image.ANTIALIAS)
 img = ImageTk.PhotoImage(raw)
 
@@ -135,20 +141,21 @@ imgwidget = tk.Label(window, image=img, relief=tk.GROOVE, borderwidth=2)
 imgwidget.place(x=10, y=50)
 
 # Get plate info
-info = image_to_list('./Images/' + var.get())
+plate_info = image_to_list('./Images/' + var.get())
 
 # Place OpenALPR info in left textbox
 leftwidget = tk.Text(window, relief=tk.GROOVE, borderwidth=2, highlightthickness=0, width=29)
-leftwidget.insert(0.0, left(info))
+leftwidget.insert(0.0, left_text(plate_info))
 leftwidget.place(x=10, y=377)
 
-# Load RDW and database class
+# Load rdw and db classes
 rdw = RdwClient()
 db = DatabaseClass()
 
 # Place some more info in the right textbox
+# This is mainly info gathered from the rdw 
 rightwidget = tk.Text(window, relief=tk.GROOVE, borderwidth=2, highlightthickness=0, width=49)
-rightwidget.insert(0.0, right(info))
+rightwidget.insert(0.0, right_text(plate_info))
 rightwidget.place(x=228, y=377)
 
 # Start the GUI loop

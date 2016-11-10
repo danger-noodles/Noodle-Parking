@@ -57,12 +57,12 @@ def image_to_list(image) -> list:
 
 # Initialize the library using European style license plates
 alpr = Alpr('eu', './OpenALPR/Utils/openalpr.conf', './OpenALPR/Utils/runtime_data')
-# TODO: is there a better way of handling errors?
+# TODO: Is there a better way of handling errors?
 if not alpr.is_loaded():
     print('Error loading OpenALPR!')
     sys.exit(1)
 
-# Specify the top N possible plates to return
+# Specify the top N possibilities to return
 alpr.set_top_n(5)
 
 # Provide the library with the "nl" region for pattern matching
