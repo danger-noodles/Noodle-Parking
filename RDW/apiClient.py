@@ -1,5 +1,11 @@
+#!/usr/bin/env python3
+
+## IMPORTS
+
 import requests
 
+
+## CLASSES
 
 class ApiClient:
     api_key = None
@@ -18,7 +24,7 @@ class ApiClient:
         data = requests.get(self.api_url + path, params = params, headers = {'ovio-api-key': self.api_key})
 
         if data.status_code == 200:
-            return data.json()
+            return(data.json())
 
         # API error
         raise Exception(data.reason)

@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+
+## IMPORTS
+
 from smtplib import SMTP
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
@@ -5,6 +9,8 @@ from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from Utils.config import EMAIL_HOSTNAME, EMAIL_FROM_ADDRESS, EMAIL_POST, EMAIL_ACCOUNT, EMAIL_PASSWORD
 
+
+# CLASSES
 
 class EmailSmtp:
     # Server
@@ -91,7 +97,7 @@ class EmailSmtp:
 
     def send_stomp_mail(self):
         self.set_content('''
-            Geachte heer dijkstra,
+            Geachte heer Dijkstra,
 
 
             Iemand heeft zojuist geprobeerd in te checken met een diesel auto waarvan de laatste aangifte van voor 2001 is.

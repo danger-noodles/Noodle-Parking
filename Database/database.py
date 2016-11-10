@@ -1,4 +1,6 @@
-'''' Author: Wouter Dijkstra '''
+#!/usr/bin/env python3
+
+## IMPORTS
 
 import pymysql
 import time
@@ -8,6 +10,9 @@ connection = pymysql.connect(host=DB_HOST,
                              passwd=DB_PASS,
                              db=DB)
 current = connection.cursor(pymysql.cursors.DictCursor)
+
+
+## CLASSES
 
 class DatabaseClass:
     def close_connection(self):

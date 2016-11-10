@@ -23,26 +23,6 @@ def add_hyphens(plate):
 
     return(plate)
 
-# This function converts the image to a string and prints it in formatted columns
-# intended for command line use and easy debugging
-def image_to_print(image):
-    results = alpr.recognize_file(image)
-
-    print(image)
-    for plate in results['results']:
-        print('   %12s %12s' % ('Plate', 'Confidence'))
-
-        for candidate in plate['candidates']:
-            region = '-'
-            if candidate['matches_template']:
-                region = '+'
-
-                plate = add_hyphens(candidate['plate'])
-            else:
-                plate = candidate['plate']
-
-            print("  %s %12s%12f" % (region, plate, candidate['confidence']))
-
 # This function converts and image to a string and returns an easy to use (for scripts) ditc
 def image_to_list(image):
     results = alpr.recognize_file(image)
