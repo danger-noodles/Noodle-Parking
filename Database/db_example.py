@@ -50,6 +50,10 @@ database = DatabaseClass()
 # var2 = database.get_customer_details_by_customer_id('1')
 # print(var2)
 
+# database.checkin('9-ZZZ-AA', 'BENZINE', '1996', 'WOUTERAUTO', 'ENORM', 'BLAUW','6')
+db.checkin(info[0]['plate'], data['parking_car_fuel'], str.split(data['parking_car_releasedate'], '-')[0], data['parking_car_name'], data['parking_car_type'], data['parking_car_body'], str(data['parking_car_cylinder_capacity']))
+database.checkout(6)
+
 # print(bool)
 ### Closes the database connection
 database.close_connection()

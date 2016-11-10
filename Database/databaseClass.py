@@ -136,7 +136,7 @@ class DatabaseClass:
                          " `parking_car_type`,"
                          " `parking_car_body`,"
                          " `parking_car_cylinder_capacity`) "
-                         "VALUES (NULL,'{0}','{1}','{2}','{3}','{4}','{5}','{6}')".format(parking_numberplate_id,
+                         "VALUES (NULL,'{0}','{1}',NULL,'{2}','{3}','{4}','{5}','{6}',{7})".format(parking_numberplate_id,
                                                                                              parking_start,
                                                                                              parking_car_fuel,
                                                                                              parking_car_releasedate,
@@ -152,7 +152,7 @@ class DatabaseClass:
         except Exception as error:
             print("Exception:", error)
 
-    def checkout(self, parking_numberplate_id):
+    def checkout(self, parking_numberplate):
         try:
             with connection.cursor() as cursor:
                 parking_stop = int(time.time())
