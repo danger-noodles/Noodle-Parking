@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-# TODO: Use -> stuff?
-
 ## IMPORTS
 
 # Installed modules
@@ -20,7 +18,7 @@ from RDW.rdwClient import *
 ## FUNCTIONS
 
 # Function that updates the image and textboxes, gets called by window.bind
-def callback(e):
+def callback(e) -> None:
     # Creates a Tkinter compatible image
     raw = Image.open('./Images/' + var.get()).resize((562, 314), Image.ANTIALIAS)
     img = ImageTk.PhotoImage(raw)
@@ -41,7 +39,7 @@ def callback(e):
     rightwidget.insert(0.0, right(info))
 
 # Function thats creates the left textbox text
-def left(info):
+def left(info) -> str:
     if len(info) == 0:
         return(' No license plate detected!\n\n')
 
@@ -60,7 +58,7 @@ def left(info):
     return(text)
 
 # Function thats creates the right textbox text, also sends some info to the db possibly
-def right(info):
+def right(info) -> str:
     if len(info) == 0:
         return('\n\n    [×] ?\n')
 
@@ -101,7 +99,7 @@ def right(info):
 
 # This function checks if a car matches our criteria
 # (diesel and older than 2001)
-def validate_plate(fuel_type, year):
+def validate_plate(fuel_type, year) -> bool:
     if fuel_type.lower() == 'diesel' and int(year[0]) < 2001:
         return(False)
     else:
