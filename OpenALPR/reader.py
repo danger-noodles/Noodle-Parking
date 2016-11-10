@@ -11,7 +11,7 @@ import sys
 
 # Add hyphens to plates manually myself, since the API needs them
 # https://github.com/openalpr/openalpr/issues/416
-def add_hyphens(plate):
+def add_hyphens(plate) -> str:
     count = re.findall(r'[0-9][A-Z]|[A-Z][0-9]', plate)
 
     if len(count) == 1:
@@ -24,7 +24,7 @@ def add_hyphens(plate):
     return(plate)
 
 # This function converts and image to a string and returns an easy to use (for scripts) ditc
-def image_to_list(image):
+def image_to_list(image) -> list:
     results = alpr.recognize_file(image)
 
     # TODO: Is this needed?
