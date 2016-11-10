@@ -30,6 +30,7 @@ class controle(Pag):
         self.initialize()
     def initialize(self):
         global info
+        global var
 
         # Add images to dropdown
         images = []
@@ -160,7 +161,7 @@ class uitcheck(Pag):
         self.initialize()
 
     def initialize(self):
-        global var
+        global var3
         global voornaam
         global achternaam
         global geboorteDatum
@@ -171,10 +172,10 @@ class uitcheck(Pag):
 
         geslacht = ['man',
                     'vrouw']
-        var = tk.StringVar()
-        var.set(geslacht[0])
+        var3 = tk.StringVar()
+        var3.set(geslacht[0])
 
-        w = tk.OptionMenu(self, var, *geslacht)
+        w = tk.OptionMenu(self, var3, *geslacht)
         w.pack()
 
         tk.Label(self, text='Voornaam:').pack(side='top', anchor=tk.N)
@@ -208,7 +209,7 @@ class uitcheck(Pag):
         tk.Button(self, text='Schrijf in', command=self.printlab).pack(side='top', anchor=tk.N)
 
     def printlab(self):
-        db.insert_customer(voornaam.get(), achternaam.get(), adres.get(), postcode.get(), var.get(), woonplaats.get(), e_mail.get())
+        db.insert_customer(voornaam.get(), achternaam.get(), adres.get(), postcode.get(), var3.get(), woonplaats.get(), e_mail.get())
         mainpage.DoneReg()
 
 class betaal(Pag):
