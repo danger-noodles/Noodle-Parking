@@ -20,6 +20,8 @@ current = connection.cursor(pymysql.cursors.DictCursor)
 
 
 class DatabaseClass:
+
+
     """
              Databaseclass containing all the functions
     """
@@ -232,7 +234,7 @@ class DatabaseClass:
                          " `parking_car_type`,"
                          " `parking_car_body`,"
                          " `parking_car_cylinder_capacity`) "
-                         "VALUES (NULL,'{0}','{1}',NULL,'{2}','{3}','{4}','{5}','{6}',{7})".format(parking_numberplate_id,
+                         "VALUES (NULL,'{0}','{1}',NULL,'{2}','{3}','{4}','{5}','{6}','{7}')".format(parking_numberplate_id,
                                                                                              parking_start,
                                                                                              parking_car_fuel,
                                                                                              parking_car_releasedate,
@@ -248,7 +250,7 @@ class DatabaseClass:
         except Exception as error:
             print("Exception:", error)
 
-    def checkout(self, parking_numberplate_id):
+    def checkout(self, parking_numberplate):
         """
             Function to checkout a car based on numberplate.
             Updates the parking_stop in the parking_history to a current timestamp.
@@ -260,12 +262,31 @@ class DatabaseClass:
         """
         try:
             with connection.cursor() as cursor:
+
+                parking_numberplate_id = self.get_numberplate_id_by_numberplate(parking_numberplate)
                 parking_stop = int(time.time())
                 # Create a new record
-                cursor.execute("UPDATE `parking_history` SET `parking_stop`= "+str(parking_stop)+" WHERE `parking_numberplate_id` = "+str(parking_numberplate_id)+" ORDER BY parking_id DESC LIMIT 1")
+                cursor.execute("UPDATE `parking_history` SET `parking_stop`= "+str(parking_stop)+" WHERE `parking_numberplate_id` = "+str(parking_numberplate_id['id'])+" ORDER BY parking_id DESC LIMIT 1")
 
             # connection is not autocommit by default. So you must commit to save
             # your changes.
             connection.commit()
+        except Exception as error:
+            print("Exception:", error)
+
+    def get_numberplate_id_by_numberplate(self, numberplate) -> dict:
+        """
+            Function to get the numberplate id based on a given numberplate
+
+            Args:
+                STRING: numberplate: The numberplate to get the numberplate id from
+            Returns:
+                select: dictionary with the data returned from the SQL query
+        """
+        try:
+            current.execute("SELECT id FROM `parking_numberplate` WHERE '"+numberplate+"' ORDER BY id DESC LIMIT 1")
+            for data in current:
+                select = data
+            return select
         except Exception as error:
             print("Exception:", error)

@@ -52,7 +52,11 @@ database = DatabaseClass()
 
 # database.checkin('9-ZZZ-AA', 'BENZINE', '1996', 'WOUTERAUTO', 'ENORM', 'BLAUW','6')
 # db.checkin(info[0]['plate'], data['parking_car_fuel'], str.split(data['parking_car_releasedate'], '-')[0], data['parking_car_name'], data['parking_car_type'], data['parking_car_body'], str(data['parking_car_cylinder_capacity']))
-database.checkout(6)
+# database.checkout(6)
+
+var = database.get_numberplate_id_by_numberplate('4-FYA-AA')
+print(var['id'])
+
 
 # print(bool)
 ### Closes the database connection
