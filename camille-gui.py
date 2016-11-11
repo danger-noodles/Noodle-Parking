@@ -13,6 +13,8 @@ import time
 from Database.database import *
 from OpenALPR.reader import *
 from RDW.rdwClient import *
+from SMTP.email import *
+from Utils.config import *
 
 
 ## FUNCTIONS
@@ -62,6 +64,7 @@ def left_text(info) -> str:
 # Also sends some info to the db possibly
 def right_text(info) -> str:
     if len(info) == 0:
+        print('DEBUG: none')
         return('\n\n    [×] ?\n')
 
     # Try to get the data from the database
@@ -82,9 +85,13 @@ def right_text(info) -> str:
     if used != 'none':
         # Check if the car matches our criteria (diesel and older than 2001)
         if validate_plate(data['parking_car_releasedate'], data['parking_car_fuel']):
-            text = '\n\n   [-] ' + info[0]['plate']
-        else:
             text = '\n\n   [+] ' + info[0]['plate']
+        else:
+            text = '\n\n   [-] ' + info[0]['plate']
+
+            # Send mail notifying admin
+            # TODO: This doesn't work, someone else can fix it.
+            mail.send_stomp_mail()
 
         text += '\n\n    * Voertuig soort: ' + data['parking_car_type']
         text += '\n    * Intrichting: ' + data['parking_car_body']
@@ -97,7 +104,7 @@ def right_text(info) -> str:
 
     # Place data in db if rdw was used to gather data
     if used == 'rdw':
-        db.checkin(info[0]['plate'], data['parking_car_fuel'], str.split(data['parking_car_releasedate'], '-')[0], data['parking_car_name'], data['parking_car_type'], data['parking_car_body'], str(data['parking_car_cylinder_capacity']))
+        db.checkin(info[0]['plate'], data['parking_car_fuel'], str.split(data['parking_car_releasedate'], '-')[0], data['parking_car_name'], data['parking_car_type'], data['parking_car_body'], data['parking_car_cylinder_capacity'])
 
     return(text)
 
@@ -148,9 +155,13 @@ leftwidget = tk.Text(window, relief=tk.GROOVE, borderwidth=2, highlightthickness
 leftwidget.insert(0.0, left_text(plate_info))
 leftwidget.place(x=10, y=377)
 
-# Load rdw and db classes
+# Load rdw, mail and db classes
 rdw = RdwClient()
 db = DatabaseClass()
+mail = EmailSmtp()
+
+# Set mail subject and adress
+mail.set_subject('Diesel auto probeerd in te checken!')
 
 # Place some more info in the right textbox
 # This is mainly info gathered from the rdw 

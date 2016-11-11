@@ -141,7 +141,7 @@ class DatabaseClass:
                          " `parking_car_type`,"
                          " `parking_car_body`,"
                          " `parking_car_cylinder_capacity`) "
-                         "VALUES (NULL,'{0}','{1}',NULL,'{2}','{3}','{4}','{5}','{6}',{7})".format(parking_numberplate_id,
+                         "VALUES (NULL,'{0}','{1}',NULL,'{2}','{3}','{4}','{5}','{6}','{7}')".format(parking_numberplate_id,
                                                                                              parking_start,
                                                                                              parking_car_fuel,
                                                                                              parking_car_releasedate,

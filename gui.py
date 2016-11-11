@@ -1,40 +1,41 @@
 #!/usr/bin/env python3
 
-# import van modules die we gebruiken
-from Database.database import DatabaseClass
-from Utils.emailSMTP import EmailSmtp
-import tkinter as tk
+## IMPORT
+
+# System modules
+from PIL import ImageTk, Image
 import fnmatch
 import os
+import tkinter as tk
 import time
-from PIL import ImageTk, Image
-from OpenALPR.reader import *
-from RDW.rdwClient import RdwClient
 
-#classes van modules in variabelen zetten om makkelijk aan te roepen
+# Our modules
+from Database.database import *
+from OpenALPR.reader import *
+from RDW.rdwClient import *
+from Utils.emailSMTP import *
+
+# Load classes
 db = DatabaseClass()
-email_server = EmailSmtp()
+mail = EmailSmtp()
 rdw = RdwClient()
 
-#basic class that frame classes import
+# Basic class that frame classes import
 class Pag(tk.Frame):
-    #functie om te initialiseren
     def __init__(self):
         tk.Frame.__init__(self)
-    # functie om de frame te laten showen
     def show(self):
         self.lift()
 
-#Frame class to put in window container
+ #Frame class to put in window container
 class controle(Pag):
-    #frame initialization
     def __init__(self):
         super().__init__()
         label = tk.Label(self, text='dit is de controle pagina')
         label.pack(side='bottom')
         self.initialize()
 
-    #function that initializes the widgets
+    # Function that initializes the widgets
     def initialize(self):
         global info
         global var
@@ -74,9 +75,9 @@ class controle(Pag):
 
         tk.Button(self, text='volgende', command=mainpage.Register).pack()
 
-    #function that updates the images and widgets
+    # Function that updates the images and widgets
     def callback(self, e):
-        # Creates a Tkinter compatible image
+        # Create a Tkinter compatible image
         raw = Image.open('./Images/' + var.get()).resize((562, 314), Image.ANTIALIAS)
         img = ImageTk.PhotoImage(raw)
 
