@@ -5,7 +5,6 @@ from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from Utils.config import EMAIL_HOSTNAME, EMAIL_FROM_ADDRESS, EMAIL_POST, EMAIL_ACCOUNT, EMAIL_PASSWORD
 
-
 class EmailSmtp:
     # Server
     host = EMAIL_HOSTNAME
@@ -91,8 +90,7 @@ class EmailSmtp:
 
     def send_stomp_mail(self):
         self.set_content('''
-            Geachte heer dijkstra,
-
+            Geachte heer Dijkstra,
 
             Iemand heeft zojuist geprobeerd in te checken met een diesel auto waarvan de laatste aangifte van voor 2001 is.
             Wij hopen dat u zo spoedig mogelijk actie onderneemt.
@@ -133,7 +131,7 @@ class EmailSmtp:
         msg_alternative.attach(MIMEText(html, 'html'))
 
         # image
-        fp = open('../Utils/snek.jpg', 'rb')
+        fp = open('./Utils/snek.jpg', 'rb')
         msg_image = MIMEImage(fp.read())
         fp.close()
         # Define the image's ID as referenced above
@@ -141,7 +139,6 @@ class EmailSmtp:
         msg_root.attach(msg_image)
 
         self.server.sendmail(self.from_address, self.to_address, msg_root.as_string())
-        # print(msg.as_string())
 
     def quit(self):
         self.server.quit()

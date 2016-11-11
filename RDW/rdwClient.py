@@ -19,14 +19,34 @@ class RdwClient:
 
         # Return if necessary data is given
         if 'datumeersteafgiftenederland' in data or 'hoofdbrandstof' in data:
-            # Rename keys to match the database
-            data['parking_car_type'] = data.pop('voertuigsoort')
-            data['parking_car_body'] = data.pop('inrichting')
-            data['parking_car_fuel'] = data.pop('merk')
-            data['parking_car_fuel'] = data.pop('hoofdbrandstof')
-            data['parking_car_cylinder_capacity'] = data.pop('cilinderinhoud')
-            data['parking_car_releasedate'] = data.pop('datumeersteafgiftenederland')
+            # Replace these horrible dutch key names with the ones we use in the database
+            try:
+                data['parking_car_type'] = data.pop('voertuigsoort')
+            except KeyError:
+                data['parking_car_type'] = 'None'
+            try:
+                data['parking_car_body'] = data.pop('inrichting')
+            except KeyError:
+                data['parking_car_body'] = 'None'
+            try:
+                data['parking_car_name'] = data.pop('merk')
+            except KeyError:
+                data['parking_car_name'] = 'None'
+            try:
+                data['parking_car_fuel'] = data.pop('hoofdbrandstof')
+            except KeyError:
+                data['parking_car_fuel'] = 'None'
+            try:
+                data['parking_car_cylinder_capacity'] = data.pop('cilinderinhoud')
+            except KeyError:
+                data['parking_car_cylinder_capacity'] = 'None'
+            try:
+                data['parking_car_releasedate'] = data.pop('datumeersteafgiftenederland')
+            except KeyError:
+                data['parking_car_releasedate'] = 'None'
+
             self.data = data
-            return True
+
+            return(True)
         else:
-            return False
+            return(False)

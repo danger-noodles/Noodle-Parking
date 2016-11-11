@@ -1,6 +1,4 @@
 import requests
-
-
 class ApiClient:
     api_key = None
     api_url = None
