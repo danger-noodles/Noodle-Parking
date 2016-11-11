@@ -7,6 +7,11 @@ from Utils.config import EMAIL_HOSTNAME, EMAIL_FROM_ADDRESS, EMAIL_POST, EMAIL_A
 
 
 class EmailSmtp:
+    """
+        Author: Nick Bout
+        Class: EmailSmtp
+        This class uses the smtplib library to send emails
+    """
     # Server
     host = EMAIL_HOSTNAME
     port = EMAIL_POST
@@ -18,6 +23,12 @@ class EmailSmtp:
     content = None
 
     def __init__(self, debug_level = 0):
+        """
+            Constructor function
+
+            ARGS:
+                debug_level INT: debug level for the smtplib || Default value 0
+        """
         self.server.set_debuglevel(debug_level)
 
         self.server.ehlo()
@@ -25,15 +36,47 @@ class EmailSmtp:
         self.server.login(EMAIL_ACCOUNT, EMAIL_PASSWORD)
 
     def set_to_address(self, address):
+        """
+            Setter function for to_address
+
+            ARGS:
+                address STRING: the receiving email
+            RETURNS:
+                --
+        """
         self.to_address = address
 
     def set_content(self, content):
+        """
+            Setter function for content
+
+            ARGS:
+                content STRING: Content for the email
+            RETURNS:
+                --
+        """
         self.content = content
 
     def set_subject(self, subject):
+        """
+            Setter function for subject
+
+            ARGS:
+                subject STRING: Email subject
+            RETURNS:
+                --
+        """
         self.subject = subject
 
     def send_invoice_mail(self, invoice_data):
+        """
+            Function to send invoice email
+
+            ARGS:
+                invoice_data DICT: Dictionary with all data needed for the invoice
+            RETURNS:
+                --
+        """
         self.set_content('''
             Factuur voor:<br />
             ''' + invoice_data['client']['name'] + '''<br />
@@ -90,9 +133,16 @@ class EmailSmtp:
         self.send_mail()
 
     def send_stomp_mail(self):
-        self.set_content('''
-            Geachte heer dijkstra,
+        """
+            Function to send stomp email
 
+            ARGS:
+                --
+            RETURNS:
+                --
+        """
+        self.set_content('''
+            Geachte heer Dijkstra,
 
             Iemand heeft zojuist geprobeerd in te checken met een diesel auto waarvan de laatste aangifte van voor 2001 is.
             Wij hopen dat u zo spoedig mogelijk actie onderneemt.
@@ -100,6 +150,14 @@ class EmailSmtp:
         self.send_mail()
 
     def send_mail(self):
+        """
+            Function to a send email, this uses its own variables set with the setters
+
+            ARGS:
+                --
+            RETURNS:
+                --
+        """
         # Error exceptions
         if not self.content:
             raise ValueError('No message set')
@@ -133,7 +191,7 @@ class EmailSmtp:
         msg_alternative.attach(MIMEText(html, 'html'))
 
         # image
-        fp = open('../Utils/snek.jpg', 'rb')
+        fp = open('./Utils/snek.jpg', 'rb')
         msg_image = MIMEImage(fp.read())
         fp.close()
         # Define the image's ID as referenced above
@@ -141,7 +199,14 @@ class EmailSmtp:
         msg_root.attach(msg_image)
 
         self.server.sendmail(self.from_address, self.to_address, msg_root.as_string())
-        # print(msg.as_string())
 
     def quit(self):
+        """
+            Function to quit server connection
+
+            ARGS:
+                --
+            RETURNS:
+                --
+        """
         self.server.quit()
