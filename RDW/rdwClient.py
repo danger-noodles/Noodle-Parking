@@ -3,13 +3,34 @@ from RDW.apiClient import ApiClient
 
 
 class RdwClient:
+    """
+        Author: Nick Bout
+        Class: RdwClient
+        This class uses the API client to fetch the car data from the RDW api based on licence plate
+    """
     client = ApiClient(RDW_URL, RDW_KEY)
     data = None
 
     def get_plate_data(self) -> dict:
+        """
+            Function to get the data returned by the RDW API
+
+            ARGS:
+                --
+            Returns:
+                DICT: Dictionary with all returned data
+        """
         return self.data
 
-    def fetch_by_plate(self, plate) -> dict:
+    def fetch_by_plate(self, plate) -> bool:
+        """
+            Function to fetch car data by licence plate from the RDW API
+
+            ARGS:
+                plate STRING: the licence plate in string format. E.G: xx-99-xx
+            Returns:
+                BOOL: Returns if API call was a success
+        """
         try:
             # API call to get plate data
             data = self.client.get('/voertuiggegevens/' + plate)
@@ -47,6 +68,6 @@ class RdwClient:
 
             self.data = data
 
-            return(True)
+            return True
         else:
-            return(False)
+            return False
