@@ -13,7 +13,7 @@ import time
 from Database.database import *
 from OpenALPR.reader import *
 from RDW.rdwClient import *
-from Utils.emailSMTP import *
+from SMTP.email import *
 
 # Load classes
 db = DatabaseClass()
@@ -119,42 +119,45 @@ class controle(Pag):
     def right(self, info):
         global data
         if len(info) == 0:
+            print('DEBUG: none')
             return('\n\n    [×] ?\n')
-
-        # Try to get the data from the database
-        try:
-            used = 'db'
-            data = db.get_customer_history_by_numberplate(info[0]['plate'], 1)[0]
-        except IndexError:
-            used = 'rdw'
-            rdw.fetch_by_plate(info[0]['plate'])
-            data = rdw.get_plate_data()
-            if data == None:
-                used = 'none'
-
-        print('DEBUG: ' + used)
-
-        if used != 'none':
-            # Check if the car matches our criteria (diesel and older than 2001)
-            if self.validate_plate(data['parking_car_releasedate'], data['parking_car_fuel']):
-                text = '\n\n   [-] ' + info[0]['plate']
+        
+            # Try to get the data from the database
+            try:
+                used = 'db'
+                data = db.get_customer_history_by_numberplate(info[0]['plate'], 1)[0]
+            # If the license plate is not found in the db, try using the rdw
+            except IndexError:
+                used = 'rdw'
+                rdw.fetch_by_plate(info[0]['plate'])
+                data = rdw.get_plate_data()
+                # Don't gather data if nothing could be found in either the db or rdw
+                if data == None:
+                    used = 'none'
+        
+            print('DEBUG: ' + used)
+        
+            if used != 'none':
+                # Check if the car matches our criteria (diesel and older than 2001)
+                if validate_plate(data['parking_car_releasedate'], data['parking_car_fuel']):
+                    text = '\n\n   [+] ' + info[0]['plate']
+                else:
+                    text = '\n\n   [-] ' + info[0]['plate']
+        
+                text += '\n\n    * Voertuig soort: ' + data['parking_car_type']
+                text += '\n    * Intrichting: ' + data['parking_car_body']
+                text += '\n    * Merk: ' + data['parking_car_name']
+                text += '\n    * Brandstof type: ' + data['parking_car_fuel']
+                text += '\n    * Cilinder inhoud: ' + str(data['parking_car_cylinder_capacity'])
+                text += '\n    * Datum afgifte: ' + str.split(data['parking_car_releasedate'], '-')[0]
             else:
-                text = '\n\n   [+] ' + info[0]['plate']
-
-            text += '\n\n    * Voertuig soort: ' + data['parking_car_type']
-            text += '\n    * Intrichting: ' + data['parking_car_body']
-            text += '\n    * Merk: ' + data['parking_car_name']
-            text += '\n    * Brandstof type: ' + data['parking_car_fuel']
-            text += '\n    * Cilinder inhoud: ' + str(data['parking_car_cylinder_capacity'])
-            text += '\n    * Datum afgifte: ' + str.split(data['parking_car_releasedate'], '-')[0]
-
-        # Place data in db
-        if used == 'rdw':
-            db.checkin(info[0]['plate'], data['parking_car_fuel'], str.split(data['parking_car_releasedate'], '-')[0], data['parking_car_name'], data['parking_car_type'], data['parking_car_body'], str(data['parking_car_cylinder_capacity']))
-        elif used == 'none':
-            text = '\n\n   [×] ' + info[0]['plate']
-
-        return(text)
+                text = '\n\n   [×] ' + info[0]['plate']
+        
+            # Place data in db if rdw was used to gather data
+            if used == 'rdw':
+                db.checkin(info[0]['plate'], data['parking_car_fuel'], str.split(data['parking_car_releasedate'], '-')[0], data['parking_car_name'], data['parking_car_type'], data['parking_car_body'], data['parking_car_cylinder_capacity'])
+        
+            return(text)
 
     #function that checks what fuel the car uses and wich year the car is from.
     #if certain conditions are met, then the car is not allowed.
@@ -289,8 +292,8 @@ class done2(Pag):
         try:
             ServData = db.get_customer_details_by_numberplate(info[0]['plate'])
             #print(db.get_customer_details_by_customer_id('1'))
-            email_server.set_subject('Factuur Parkeren')
-            email_server.set_to_address(ServData['customer_email'])
+            mail.set_subject('Factuur Parkeren')
+            mail.set_to_address(ServData['customer_email'])
             #print(ServData)
             invoice = {
                 'id': 1337,
@@ -306,7 +309,7 @@ class done2(Pag):
                     'country': 'Nederland'
                 }
             }
-            email_server.send_invoice_mail(invoice)
+            emmailend_invoice_mail(invoice)
         except:
            pass
         tk.Button(self, text = 'volgende klant', command = mainpage.start).place(rely = 0.4, relx = 0.5, anchor = tk.CENTER)
@@ -366,7 +369,7 @@ class mainpage(tk.Frame):
                 p6.lift()
         else:
             tk.Label(controle, text='Wouter komt stompen').pack()
-            email_server.send_stomp_mail()
+            mail.send_stomp_mail()
 
     #function to switch frame
     def start():
